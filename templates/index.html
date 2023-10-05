@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask mySQL SqlAlchemy</title>
+  
+</head>
+<!-- Tailwind CSS via CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-200">
+
+<header class="bg-red-600 text-white p-4">
+    <h1 class="text-2xl">Flask with sqlAlchemy and mySQL on Azure</h1>
+</header>
+
+<table class="border-collapse border border-gray-400">
+    <thead>
+        <tr>
+            <th class="border border-gray-400 p-2">Patient ID</th>
+            <th class="border border-gray-400 p-2">MRN</th>
+            <th class="border border-gray-400 p-2">First Name</th>
+            <th class="border border-gray-400 p-2">Last Name</th>
+            <th class="border border-gray-400 p-2">Date of Birth</th>
+            <th class="border border-gray-400 p-2">Address</th>
+            <th class="border border-gray-400 p-2">Phone Number</th>
+            <th class="border border-gray-400 p-2">Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patient in patients %}
+            <tr>
+                <td class="border border-gray-400 p-2">{{ patient.patient_id }}</td>
+                <td class="border border-gray-400 p-2">{{ patient.MRN }}</td>
+                {% for demographic in demographics %}
+                    <td class="border border-gray-400 p-2">{{ demographic.first_name }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.last_name }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.date_of_birth }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.address }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.phone_number }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.email }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<footer class="bg-red-600 text-white p-4 mt-6">
+    <p>Check <a href="https://github.com/jas-tang/flask_4_databases_mysql_vm">Github</a> for more information</p>
+</footer>
+
+<style>
+    a:link {
+      color: green;
+      background-color: transparent;
+      text-decoration: none;
+    }
+    a:visited {
+      color: pink;
+      background-color: transparent;
+      text-decoration: none;
+    }
+    a:hover {
+      color: red;
+      background-color: transparent;
+      text-decoration: underline;
+    }
+    a:active {
+      color: yellow;
+      background-color: transparent;
+      text-decoration: underline;
+    }
+    </style>
+
+</body>
+</html>
