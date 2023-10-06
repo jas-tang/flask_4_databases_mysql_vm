@@ -3,7 +3,7 @@ This is a repository for Assignment 4b in HHA504.
 
 # MySQL Setup on Azure VM
 
-I initially set up the VM server on Azure with minimal settings to lower cost. The following is what it looks like.
+I initially set up the VM server on Azure with minimal settings to lower cost. If I have time, I will try replicating this in GCP. The following is what it looks like.
 ![](https://github.com/jas-tang/flask_4_databases_mysql_vm/blob/main/images/azure1.JPG)
 
 This is my VM server setup
@@ -105,7 +105,7 @@ Then, ininstall sqlalchemy, but specifically version 1.4.
 ```
 pip install sqlalchemy==1.4.46
 ```
-Then import packeges.
+Then import packages.
 ```
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -126,3 +126,137 @@ The reason why I pip uninstalled sqlalchemy, was because when installing sqlalch
 Engine.table_names is depreciated in newer versions. You can see that I did get the connection to mySQL though. 
 
 # Integration with Flask
+
+I created an app.py file. I followed this [link](https://www.digitalocean.com/community/tutorials/how-to-use-flask-sqlalchemy-to-interact-with-databases-in-a-flask-application#step-2-setting-up-the-database-and-model) as a guideline. 
+```
+from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+
+# Configure the database URI using PyMySQL
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://jason:jason2023@172.174.249.223:3306/testdb'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize the SQLAlchemy instance
+db = SQLAlchemy(app)
+
+class Patients(db.Model):
+    patient_id = db.Column(db.Integer, primary_key=True)
+    MRN = db.Column(db.String(50), nullable=False)
+
+class Demographics(db.Model):
+    patient_id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    date_of_birth = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(50), nullable=False)
+    phone_number = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
+
+@app.route('/')
+def index():
+    patients = Patients.query.all()
+    demographics = Demographics.query.all()
+    return render_template('index.html', patients=patients, demographics=demographics)
+
+if __name__ == '__main__':
+    app.run(
+        debug=True,
+        port=8080
+    )
+```
+Some highlights: 
+* Imported flask packages
+* Imported SQLAlchemy
+* Using ```Flask(__name___)``` created a flask application, assigning it to app.
+* Used app.config and set it to my Azure VM server
+* Initialized the SQLAlchemy instance
+* Created two classes, one for each table
+* Created an index.html to connect
+
+Index.HTML: 
+```
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask mySQL SqlAlchemy</title>
+  
+</head>
+<!-- Tailwind CSS via CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-200">
+
+<header class="bg-red-600 text-white p-4">
+    <h1 class="text-2xl">Flask with sqlAlchemy and mySQL on Azure</h1>
+</header>
+
+<table class="border-collapse border border-gray-400">
+    <thead>
+        <tr>
+            <th class="border border-gray-400 p-2">Patient ID</th>
+            <th class="border border-gray-400 p-2">MRN</th>
+            <th class="border border-gray-400 p-2">First Name</th>
+            <th class="border border-gray-400 p-2">Last Name</th>
+            <th class="border border-gray-400 p-2">Date of Birth</th>
+            <th class="border border-gray-400 p-2">Address</th>
+            <th class="border border-gray-400 p-2">Phone Number</th>
+            <th class="border border-gray-400 p-2">Email</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patient in patients %}
+            <tr>
+                <td class="border border-gray-400 p-2">{{ patient.patient_id }}</td>
+                <td class="border border-gray-400 p-2">{{ patient.MRN }}</td>
+                {% for demographic in demographics %}
+                    <td class="border border-gray-400 p-2">{{ demographic.first_name }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.last_name }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.date_of_birth }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.address }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.phone_number }}</td>
+                    <td class="border border-gray-400 p-2">{{ demographic.email }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<footer class="bg-red-600 text-white p-4 mt-6">
+    <p>Check <a href="https://github.com/jas-tang/flask_4_databases_mysql_vm">Github</a> for more information</p>
+</footer>
+
+<style>
+    a:link {
+      color: green;
+      background-color: transparent;
+      text-decoration: none;
+    }
+    a:visited {
+      color: pink;
+      background-color: transparent;
+      text-decoration: none;
+    }
+    a:hover {
+      color: red;
+      background-color: transparent;
+      text-decoration: underline;
+    }
+    a:active {
+      color: yellow;
+      background-color: transparent;
+      text-decoration: underline;
+    }
+    </style>
+
+</body>
+</html>
+```
+I added additional customizations, like separating the data in boxes. I also linked my github as a link as well. 
+This is the result: 
+![](https://github.com/jas-tang/flask_4_databases_mysql_vm/blob/main/images/flask.JPG)
+
+If I have time, I will try deploying this as a Flask Application. 
